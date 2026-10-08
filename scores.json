@@ -1,0 +1,37 @@
+[
+  {
+    "player_name": "CazadorAlfa",
+    "score": 7500,
+    "kills": 32,
+    "defeated_boss": true,
+    "date": "2026-10-08"
+  },
+  {
+    "player_name": "SombraNocturna",
+    "score": 5400,
+    "kills": 24,
+    "defeated_boss": true,
+    "date": "2026-10-08"
+  },
+  {
+    "player_name": "DesertRanger",
+    "score": 4800,
+    "kills": 20,
+    "defeated_boss": false,
+    "date": "2026-10-08"
+  },
+  {
+    "player_name": "PistoleroCyber",
+    "score": 3200,
+    "kills": 15,
+    "defeated_boss": false,
+    "date": "2026-10-08"
+  },
+  {
+    "player_name": "Novato",
+    "score": 1500,
+    "kills": 7,
+    "defeated_boss": false,
+    "date": "2026-10-08"
+  }
+]

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cazador del Desierto Nocturno - El Monstruo de 3 Ojos</title>
+  <meta name="description" content="Juego de acción y disparos en el desierto nocturno. Derrota monstruos terrestres y voladores y llega a 5000 puntos para vencer al temible Jefe de 3 Ojos.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="game-container">
+    <!-- Canvas de Juego -->
+    <canvas id="gameCanvas" width="960" height="540"></canvas>
+
+    <!-- HUD Superior -->
+    <div id="hud">
+      <div class="hud-card hud-health">
+        <div class="hud-label">VIDA</div>
+        <div class="health-bar-container">
+          <div id="health-bar" class="health-bar-fill"></div>
+        </div>
+        <span id="health-text">100 / 100</span>
+      </div>
+
+      <div class="hud-card hud-score">
+        <div class="hud-label">PUNTUACIÓN</div>
+        <div id="score-display" class="hud-value">0</div>
+        <div class="goal-indicator">META JEFE: <span class="highlight">5,000 PTS</span></div>
+        <div class="score-progress-container">
+          <div id="score-progress-bar"></div>
+        </div>
+      </div>
+
+      <div class="hud-card hud-weapon">
+        <div class="hud-label">ARMA</div>
+        <div id="weapon-display" class="hud-value-weapon">PISTOLAS DUALES</div>
+        <div id="powerup-timer" class="powerup-timer"></div>
+      </div>
+    </div>
+
+    <!-- Barra de Vida del Jefe (Visible a los 5000 pts) -->
+    <div id="boss-hud" class="boss-hud hidden">
+      <div class="boss-title">
+        <span class="boss-skull">💀</span>
+        <span>JEFE SUPREMO: EL MONSTRUO DE 3 OJOS</span>
+        <span class="boss-skull">💀</span>
+      </div>
+      <div class="boss-health-bar-container">
+        <div id="boss-health-bar" class="boss-health-bar-fill"></div>
+      </div>
+      <div id="boss-eyes-status" class="boss-eyes-status">
+        <span id="eye-1" class="eye-badge active">👁️ OJO ÍGNEO</span>
+        <span id="eye-2" class="eye-badge active">👁️ OJO CÓSMICO</span>
+        <span id="eye-3" class="eye-badge active">👁️ OJO DEL VACÍO</span>
+      </div>
+    </div>
+
+    <!-- Alerta de Jefe -->
+    <div id="boss-warning" class="boss-warning hidden">
+      <div class="warning-box">
+        <div class="warning-title">⚠️ ¡ALERTA DE JEFE! ⚠️</div>
+        <div class="warning-sub">¡EL MONSTRUO DE 3 OJOS HA DESPERTADO EN EL DESIERTO!</div>
+      </div>
+    </div>
+
+    <!-- Pantalla de Inicio -->
+    <div id="start-screen" class="screen-overlay">
+      <div class="menu-box">
+        <div class="badge-tag">DESIERTO DE NOCHE</div>
+        <h1 class="game-title">CAZADOR NOCTURNO<br><span class="subtitle-title">& EL MONSTRUO DE 3 OJOS</span></h1>
+        
+        <p class="story-desc">
+          Atraviesa las dunas bajo la luz de la luna llena. Elimina a los monstruos terrestres y voladores que acechan en las sombras.
+          <br><strong class="highlight">¡Alcanza 5,000 puntos para despertar y destruir al Jefe de 3 Ojos!</strong>
+        </p>
+
+        <div class="controls-guide">
+          <h3>🎮 CONTROLES DE JUEGO</h3>
+          <div class="control-grid">
+            <div class="control-item"><kbd>▲ Flecha Arriba</kbd><span>Saltar</span></div>
+            <div class="control-item"><kbd>◄ Flecha Izquierda</kbd><span>Retroceder</span></div>
+            <div class="control-item"><kbd>► Flecha Derecha</kbd><span>Avanzar</span></div>
+            <div class="control-item"><kbd>▼ Flecha Abajo</kbd><span>Agacharse / Bajar</span></div>
+            <div class="control-item full-width"><kbd>ESPACIO</kbd> / <kbd>Click</kbd> / <kbd>Z</kbd><span>Disparar Pistolas</span></div>
+          </div>
+        </div>
+
+        <div class="menu-actions">
+          <button id="start-btn" class="btn-primary">▶ COMENZAR MISIÓN</button>
+          <button id="leaderboard-btn" class="btn-secondary-action">🏆 CLASIFICACIÓN</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pantalla de Game Over -->
+    <div id="game-over-screen" class="screen-overlay hidden">
+      <div class="menu-box defeat">
+        <h2 class="result-title defeat-text">💀 HAS CAÍDO EN EL DESIERTO</h2>
+        <p class="result-score">Puntuación Final: <span id="final-score" class="highlight">0</span> pts</p>
+        <p class="result-reason" id="defeat-msg">Las criaturas de la noche te han superado.</p>
+        
+        <!-- Guardar puntuación en backend -->
+        <div class="save-score-form">
+          <input type="text" id="player-name-input" placeholder="Tu Nombre de Cazador..." maxlength="15">
+          <button id="save-score-btn" class="btn-save">💾 GUARDAR RÉCORD</button>
+        </div>
+        <div id="save-feedback" class="save-feedback"></div>
+
+        <div class="end-buttons">
+          <button id="restart-btn" class="btn-primary">🔄 REINTENTAR</button>
+          <button id="view-leaderboard-btn" class="btn-secondary-action">🏆 TABLA DE PUNTAJES</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pantalla de Victoria -->
+    <div id="victory-screen" class="screen-overlay hidden">
+      <div class="menu-box victory">
+        <div class="victory-crown">👑</div>
+        <h2 class="result-title victory-text">¡VICTORIA ÉPICA!</h2>
+        <p class="victory-sub">¡Has destruido al temible Monstruo de 3 Ojos y liberado el desierto nocturno!</p>
+        <div class="stats-box">
+          <p>Puntaje Final: <span id="victory-score" class="highlight">0</span></p>
+          <p>Enemigos Eliminados: <span id="victory-kills" class="highlight">0</span></p>
+        </div>
+
+        <!-- Guardar récord victoria -->
+        <div class="save-score-form">
+          <input type="text" id="player-name-victory-input" placeholder="Tu Nombre de Héroe..." maxlength="15">
+          <button id="save-victory-score-btn" class="btn-save victory-save">💾 REGISTRAR HAZAÑA</button>
+        </div>
+        <div id="save-victory-feedback" class="save-feedback"></div>
+
+        <div class="end-buttons">
+          <button id="play-again-btn" class="btn-primary">🏆 JUGAR DE NUEVO</button>
+          <button id="view-leaderboard-victory-btn" class="btn-secondary-action">🏆 CLASIFICACIÓN</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Clasificación / Top Scores -->
+    <div id="leaderboard-modal" class="screen-overlay hidden">
+      <div class="menu-box leaderboard-box">
+        <h2 class="leaderboard-title">🏆 SALÓN DE LA FAMA DEL DESIERTO</h2>
+        <p class="leaderboard-subtitle">Mejores Cazadores registrados en el Backend (Flask)</p>
+        <div class="leaderboard-table-container">
+          <table class="leaderboard-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Cazador</th>
+                <th>Puntaje</th>
+                <th>Bajas</th>
+                <th>Jefe</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboard-body">
+              <tr><td colspan="5">Cargando puntuaciones...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <button id="close-leaderboard-btn" class="btn-primary" style="margin-top: 15px;">⬅ VOLVER AL JUEGO</button>
+      </div>
+    </div>
+
+    <!-- Controles Táctiles / On Screen para Móviles o Mouse -->
+    <div id="touch-controls">
+      <div class="touch-dpad">
+        <button class="touch-btn" id="btn-up">▲</button>
+        <div class="touch-row">
+          <button class="touch-btn" id="btn-left">◄</button>
+          <button class="touch-btn" id="btn-down">▼</button>
+          <button class="touch-btn" id="btn-right">►</button>
+        </div>
+      </div>
+      <div class="touch-actions">
+        <button class="touch-btn-action" id="btn-shoot">🔥 DISPARAR</button>
+      </div>
+    </div>
+
+    <!-- Barra de Estado Inferior -->
+    <div id="footer-controls">
+      <div class="controls-hint">
+        <span><kbd>▲</kbd> Saltar</span>
+        <span><kbd>◄</kbd><kbd>►</kbd> Moverse</span>
+        <span><kbd>▼</kbd> Agacharse</span>
+        <span><kbd>ESPACIO</kbd> Disparar</span>
+      </div>
+      <div class="sound-toggle-box">
+        <button id="sound-btn" class="btn-secondary" title="Activar/Silenciar Audio">🔊 SONIDO: ON</button>
+        <button id="pause-btn" class="btn-secondary" title="Pausar">⏸️ PAUSA</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
